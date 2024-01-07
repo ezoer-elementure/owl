@@ -25,7 +25,7 @@
 
 ## Overview
 
-Owl templates are describe using the [QWeb](https://www.odoo.com/documentation/13.0/reference/qweb.html) specification. It is based on the XML format, and used
+Owl templates are described using the [QWeb](https://www.odoo.com/documentation/13.0/reference/qweb.html) specification. It is based on the XML format, and used
 mostly to generate HTML. In OWL, QWeb templates are compiled into functions that
 generate a virtual dom representation of the HTML. Also, since Owl is a live
 component system, there are additional directives specific to Owl (such as `t-on`).
@@ -204,7 +204,7 @@ This is done via the `t-set` directive, which takes the name of the variable to 
    ```
 
    will print `3`. Note that the evaluation is done at rendering time, not at
-   compilte time.
+   compile time.
 
 2. if there is no `t-value` attribute, the node’s body is saved and its value is
    set as the variable’s value:
@@ -374,14 +374,16 @@ is equivalent to the previous example.
 
 An important difference should be made with the usual `QWeb` behaviour: Owl
 requires the presence of a `t-key` directive, to be able to properly reconcile
-renderings.
+renderings. Key values passed to the `t-key` directive must be unique. For arrays
+this can be achieved by passing the `$as_index` value.
 
 `t-foreach` can iterate on any iterable, and also has special support for objects
 and maps, it will expose the key of the current iteration as the contents of the
 `t-as`, and the corresponding value with the same name and the suffix `_value`.
 
 In addition to the name passed via t-as, `t-foreach` provides a few other useful
-variables (note: `$as` will be replaced with the name passed to `t-as`):
+variables (Note: `$as` is a placeholder for the name passed to `t-as`. It must be
+replaced with the name in the Qweb template.):
 
 - `$as_value`: the current iteration value, identical to `$as` for arrays and
   other iterables, but for objects and maps, it provides the value (where `$as`
@@ -402,7 +404,7 @@ into the global context.
 <t t-set="existing_variable" t-value="false"/>
 <!-- existing_variable now False -->
 
-<p t-foreach="Array(3)" t-as="i" t-key="i">
+<p t-foreach="Array(3)" t-as="i" t-key="i_index">
     <t t-set="existing_variable" t-value="true"/>
     <t t-set="new_variable" t-value="true"/>
     <!-- existing_variable and new_variable now true -->
