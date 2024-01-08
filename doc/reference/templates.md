@@ -204,7 +204,7 @@ This is done via the `t-set` directive, which takes the name of the variable to 
    ```
 
    will print `3`. Note that the evaluation is done at rendering time, not at
-   compilte time.
+   compile time.
 
 2. if there is no `t-value` attribute, the node’s body is saved and its value is
    set as the variable’s value:
@@ -374,18 +374,18 @@ is equivalent to the previous example.
 
 An important difference should be made with the usual `QWeb` behaviour: Owl
 requires the presence of a `t-key` directive, to be able to properly reconcile
-renderings.
+renderings and each value used to define a `t-key` must be unique.
 
 `t-foreach` can iterate on any iterable, and also has special support for objects
-and maps, it will expose the key of the current iteration as the contents of the
-`t-as`, and the corresponding value with the same name and the suffix `_value`.
+and maps. It exposes the key of the current iteration as the contents of `t-as`,
+and its corresponding value as `t-as` with `_value` used as suffix.
 
-In addition to the name passed via t-as, `t-foreach` provides a few other useful
-variables (note: `$as` will be replaced with the name passed to `t-as`):
+In addition to the name passed via `t-as`, `t-foreach` provides a few other useful
+variables (Note: In this example, `$as` is a placeholder for the name passed to
+`t-as`.):
 
-- `$as_value`: the current iteration value, identical to `$as` for arrays and
-  other iterables, but for objects and maps, it provides the value (where `$as`
-  provides the key)
+- `$as_value`: the current iteration value. (Identical to `$as` for arrays and
+  other iterables, except for objects and maps where `$as` is the key.)
 - `$as_index`: the current iteration index (the first item of the iteration has index 0)
 - `$as_first`: whether the current item is the first of the iteration
   (equivalent to `$as_index == 0`)
@@ -394,9 +394,9 @@ variables (note: `$as` will be replaced with the name passed to `t-as`):
   available
 
 These extra variables provided and all new variables created into the `t-foreach`
-are only available in the scope of the `t-foreach`. If the variable exists outside
-the context of the `t-foreach`, the value is copied at the end of the foreach
-into the global context.
+are only available within the scope of the `t-foreach` loop. However, if the
+variable pre-existed outside the context of the `t-foreach` loop, the value is
+copied into the global context at the end of the foreach loop.
 
 ```xml
 <t t-set="existing_variable" t-value="false"/>
@@ -405,19 +405,18 @@ into the global context.
 <p t-foreach="Array(3)" t-as="i" t-key="i">
     <t t-set="existing_variable" t-value="true"/>
     <t t-set="new_variable" t-value="true"/>
-    <!-- existing_variable and new_variable now true -->
+    <!-- existing_variable and new_variable are now true -->
 </p>
 
-<!-- existing_variable always true -->
+<!-- existing_variable is now true -->
 <!-- new_variable undefined -->
 ```
 
 Even though Owl tries to be as declarative as possible, the DOM does not fully
 expose its state declaratively in the DOM tree. For example, the scrolling state,
 the current user selection, the focused element or the state of an input are not
-set as attribute in the DOM tree. This is why we use a virtual dom
-algorithm to make sure we keep the actual DOM node instead of replacing it with
-a new one.
+set as attributes in the DOM tree. This is why we use a virtual dom algorithm to
+make sure we keep the actual DOM node instead of replacing it with a new one.
 
 Consider the following situation: we have a list of two items `[{text: "a"}, {text: "b"}]`
 and we render them in this template:
@@ -638,8 +637,8 @@ class MyComponent extends Component {
 mount(MyComponent, document.body);
 ```
 
-This function simply generates an unique string id, and register the template
-under that id in the internals of Owl, then return the id.
+The `xml` helper function generates an unique string id, and registers the inline
+template using this string id in the internals of Owl, and finally returns the id.
 
 ## Rendering svg
 
@@ -686,17 +685,16 @@ graph described by the `graph` property. Note that there is a recursive structur
 here: the `Node` component uses itself as a subcomponent.
 
 **Important note:** Owl needs to properly set the namespace for each svg elements.
-Since Owl compile each template separately, it is not able to determine easily
+Since Owl compiles each template separately, it is not able to determine easily
 if a template is supposed to be included in a svg namespace or not. Therefore,
 Owl depends on a heuristic: if a tag is either `svg`, `g` or `path`, then it will
 be considered as svg. In practice, this means that each component or each sub
-templates (included with `t-call`) should have one of these tag as root tag.
+templates (included with `t-call`) should have one of these tags as a root tag.
 
 ## Restrictions
 
-Note that Owl templates forbid the use of tag and or attributes starting with
-the `block-` string. This restriction prevents name collision with the internal
-code of Owl.
+Note that Owl templates forbid the use of tags and or attributes starting with
+`block-`. This restriction prevents name collision with the internal code of Owl.
 
 ```xml
 <div><block-1>this will not be accepted by Owl</block-1></div>
